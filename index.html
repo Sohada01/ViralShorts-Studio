@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ViralShorts Studio – YouTube Shorts Content Generator</title>
+  <meta name="description" content="Generate viral YouTube Shorts ideas, titles, tags, scripts and upload times. 100% offline SaaS tool for content creators." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <!-- ============================================================
+       STYLES – Dark Neon / Glassmorphism Theme
+       ============================================================ -->
+  <style>
+    /* ── Reset & Base ─────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #090910;
+      --surface:   rgba(255,255,255,0.04);
+      --border:    rgba(255,255,255,0.10);
+      --neon1:     #ff2d78;
+      --neon2:     #8b2dff;
+      --neon3:     #ff7c2d;
+      --accent:    linear-gradient(135deg, var(--neon1), var(--neon2));
+      --text:      #f0f0f8;
+      --muted:     rgba(240,240,248,0.55);
+      --radius:    16px;
+      --shadow:    0 8px 32px rgba(0,0,0,0.5);
+      --glow1:     0 0 18px rgba(255,45,120,0.35);
+      --glow2:     0 0 18px rgba(139,45,255,0.35);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── Animated background blobs ───────────────────────────── */
+    body::before, body::after {
+      content: '';
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(120px);
+      pointer-events: none;
+      z-index: 0;
+      animation: blobFloat 8s ease-in-out infinite alternate;
+    }
+    body::before {
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(255,45,120,0.18), transparent 70%);
+      top: -150px; left: -150px;
+    }
+    body::after {
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(139,45,255,0.18), transparent 70%);
+      bottom: -150px; right: -100px;
+      animation-delay: 4s;
+    }
+    @keyframes blobFloat {
+      from { transform: translate(0,0) scale(1); }
+      to   { transform: translate(40px, 30px) scale(1.08); }
+    }
+
+    /* ── Layout wrapper ─────────────────────────────────────── */
+    .wrapper { position: relative; z-index: 1; max-width: 960px; margin: 0 auto; padding: 0 20px 60px; }
+
+    /* ── Header ─────────────────────────────────────────────── */
+    header {
+      text-align: center;
+      padding: 52px 20px 36px;
+    }
+    .logo-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 50px;
+      padding: 8px 20px;
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 20px;
+      backdrop-filter: blur(12px);
+    }
+    .logo-badge span { color: var(--neon1); font-weight: 600; }
+    header h1 {
+      font-size: clamp(2rem, 6vw, 3.6rem);
+      font-weight: 900;
+      letter-spacing: -1.5px;
+      line-height: 1.1;
+      background: var(--accent);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    header p {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 1.05rem;
+      max-width: 520px;
+      margin-inline: auto;
+    }
+
+    /* ── Tab Navigation ──────────────────────────────────────── */
+    .tabs-nav {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 36px;
+    }
+    .tab-btn {
+      position: relative;
+      padding: 10px 22px;
+      border: 1px solid var(--border);
+      border-radius: 50px;
+      background: var(--surface);
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .25s ease;
+      backdrop-filter: blur(10px);
+      user-select: none;
+    }
+    .tab-btn:hover { border-color: var(--neon1); color: var(--text); box-shadow: var(--glow1); }
+    .tab-btn.active {
+      background: var(--accent);
+      border-color: transparent;
+      color: #fff;
+      box-shadow: var(--glow1);
+    }
+
+    /* ── Tool Panels ─────────────────────────────────────────── */
+    .tool-panel { display: none; animation: fadeUp .35s ease; }
+    .tool-panel.active { display: block; }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Card ────────────────────────────────────────────────── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      backdrop-filter: blur(16px);
+      box-shadow: var(--shadow);
+      margin-bottom: 24px;
+    }
+    .card h2 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .card h2 .emoji { font-size: 1.3rem; }
+
+    /* ── Form Controls ───────────────────────────────────────── */
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      margin-bottom: 8px;
+      letter-spacing: .4px;
+    }
+    input[type="text"], select {
+      width: 100%;
+      padding: 12px 16px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 15px;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+      margin-bottom: 16px;
+    }
+    input[type="text"]:focus, select:focus {
+      border-color: var(--neon2);
+      box-shadow: 0 0 0 3px rgba(139,45,255,0.2);
+    }
+    select option { background: #1a1a2e; }
+
+    /* ── Buttons ─────────────────────────────────────────────── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 26px;
+      border: none;
+      border-radius: 50px;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform .2s, box-shadow .2s, opacity .2s;
+      user-select: none;
+    }
+    .btn:hover { transform: translateY(-2px); }
+    .btn:active { transform: scale(0.97); }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      box-shadow: var(--glow1);
+    }
+    .btn-primary:hover { box-shadow: 0 0 26px rgba(255,45,120,0.55); }
+
+    .btn-ghost {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+    .btn-ghost:hover { border-color: var(--neon1); color: var(--text); }
+
+    .btn-sm { padding: 7px 16px; font-size: 13px; }
+
+    .btn-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 4px;
+    }
+
+    /* ── Output area ─────────────────────────────────────────── */
+    .output-box {
+      background: rgba(0,0,0,0.35);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      min-height: 80px;
+      margin-top: 20px;
+      position: relative;
+    }
+    .output-box.hidden { display: none; }
+
+    .output-list { list-style: none; }
+    .output-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 14.5px;
+      line-height: 1.55;
+      animation: fadeUp .3s ease both;
+    }
+    .output-list li:last-child { border-bottom: none; }
+    .output-list li .num {
+      min-width: 26px; height: 26px;
+      background: var(--accent);
+      border-radius: 50%;
+      font-size: 12px;
+      font-weight: 800;
+      color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    /* Script output */
+    .script-block { margin-bottom: 18px; }
+    .script-block h3 {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: .6px;
+      text-transform: uppercase;
+      background: var(--accent);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 8px;
+    }
+    .script-block p { font-size: 15px; line-height: 1.7; color: var(--text); }
+
+    /* Tags */
+    .tags-cloud { display: flex; flex-wrap: wrap; gap: 8px; }
+    .tag {
+      padding: 6px 14px;
+      border-radius: 50px;
+      font-size: 13px;
+      font-weight: 600;
+      animation: fadeUp .3s ease both;
+    }
+    .tag.seo {
+      background: rgba(255,45,120,0.15);
+      border: 1px solid rgba(255,45,120,0.35);
+      color: var(--neon1);
+    }
+    .tag.hash {
+      background: rgba(139,45,255,0.15);
+      border: 1px solid rgba(139,45,255,0.35);
+      color: #b87dff;
+    }
+
+    /* Upload times */
+    .time-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-top: 8px; }
+    .time-card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px 14px;
+      text-align: center;
+      transition: border-color .25s, box-shadow .25s;
+    }
+    .time-card:hover { border-color: var(--neon2); box-shadow: var(--glow2); }
+    .time-card .time { font-size: 1.6rem; font-weight: 800; background: var(--accent); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .time-card .label { font-size: 12px; color: var(--muted); margin-top: 4px; }
+    .time-card .peak { font-size: 11px; font-weight: 600; color: #4dffb4; margin-top: 6px; }
+
+    /* Copy row at bottom of output */
+    .copy-row {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    /* Saved results section */
+    .saved-section { margin-top: 40px; }
+    .saved-section h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--muted);
+      margin-bottom: 14px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .saved-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin-bottom: 10px;
+      font-size: 13.5px;
+      color: var(--muted);
+      position: relative;
+      backdrop-filter: blur(10px);
+      animation: fadeUp .3s ease;
+    }
+    .saved-item .saved-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      color: var(--neon1);
+      margin-bottom: 6px;
+    }
+    .saved-item .del-btn {
+      position: absolute;
+      top: 10px; right: 12px;
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 16px;
+      transition: color .2s;
+    }
+    .saved-item .del-btn:hover { color: var(--neon1); }
+
+    /* ── Loader ──────────────────────────────────────────────── */
+    .loader {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 24px;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .loader-dots { display: flex; gap: 6px; }
+    .loader-dots span {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--neon1);
+      animation: bounce 1.2s ease infinite;
+    }
+    .loader-dots span:nth-child(2) { animation-delay: .2s; background: var(--neon2); }
+    .loader-dots span:nth-child(3) { animation-delay: .4s; }
+    @keyframes bounce {
+      0%,80%,100% { transform: scale(.7); opacity: .4; }
+      40%          { transform: scale(1.1); opacity: 1; }
+    }
+
+    /* ── Toast ───────────────────────────────────────────────── */
+    #toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: linear-gradient(135deg, var(--neon1), var(--neon2));
+      color: #fff;
+      padding: 12px 28px;
+      border-radius: 50px;
+      font-weight: 700;
+      font-size: 14px;
+      z-index: 999;
+      pointer-events: none;
+      transition: transform .35s cubic-bezier(.34,1.56,.64,1), opacity .35s;
+      opacity: 0;
+      box-shadow: 0 6px 28px rgba(255,45,120,0.45);
+    }
+    #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+    /* ── Footer ──────────────────────────────────────────────── */
+    footer {
+      text-align: center;
+      color: rgba(255,255,255,0.2);
+      font-size: 12px;
+      padding-top: 20px;
+    }
+
+    /* ── Responsive ──────────────────────────────────────────── */
+    @media (max-width: 560px) {
+      .card { padding: 20px 16px; }
+      header h1 { font-size: 2rem; }
+      .time-cards { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- ============================================================
+     TOAST NOTIFICATION
+     ============================================================ -->
+<div id="toast">✅ Copied to clipboard!</div>
+
+<!-- ============================================================
+     HEADER
+     ============================================================ -->
+<div class="wrapper">
+  <header>
+    <div class="logo-badge">🎬 <span>VIRAL</span>SHORTS STUDIO &nbsp;·&nbsp; <span style="color:#b87dff;">✨ Gemini AI</span></div>
+    <h1>ViralShorts<br>Studio</h1>
+    <p>Generate viral ideas, titles, tags, scripts & perfect upload times for YouTube Shorts — powered by <strong style="color:#b87dff;">Gemini AI</strong> with offline fallback.</p>
+  </header>
+
+  <!-- ==========================================================
+       TAB NAVIGATION
+       ========================================================== -->
+  <nav class="tabs-nav" role="tablist">
+    <button class="tab-btn active" onclick="switchTab('ideas',this)"   role="tab">💡 Idea Gen</button>
+    <button class="tab-btn"        onclick="switchTab('titles',this)"  role="tab">🔥 Title Gen</button>
+    <button class="tab-btn"        onclick="switchTab('tags',this)"    role="tab">🏷️ Tag Gen</button>
+    <button class="tab-btn"        onclick="switchTab('script',this)"  role="tab">📝 Script Gen</button>
+    <button class="tab-btn"        onclick="switchTab('upload',this)"  role="tab">⏰ Upload Time</button>
+    <button class="tab-btn"        onclick="switchTab('saved',this)"   role="tab">💾 Saved</button>
+  </nav>
+
+  <!-- ==========================================================
+       PANEL 1 – IDEA GENERATOR
+       ========================================================== -->
+  <section id="panel-ideas" class="tool-panel active" role="tabpanel">
+    <div class="card">
+      <h2><span class="emoji">💡</span> Viral Idea Generator</h2>
+      <label for="niche-select">Choose Your Niche</label>
+      <select id="niche-select">
+        <option value="gaming">🎮 Gaming</option>
+        <option value="funny">😂 Funny / Comedy</option>
+        <option value="gta">🚗 GTA</option>
+        <option value="tech">⚡ Tech / Gadgets</option>
+        <option value="life">✨ Lifestyle / Motivation</option>
+      </select>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="generateIdeas()">⚡ Generate Ideas</button>
+        <button class="btn btn-ghost btn-sm" onclick="clearOutput('ideas-output','ideas-actions')">🗑️ Clear</button>
+      </div>
+
+      <div id="ideas-output" class="output-box hidden"></div>
+      <div id="ideas-actions" class="copy-row" style="display:none;">
+        <button class="btn btn-ghost btn-sm" onclick="saveResult('ideas-output','💡 Ideas')">💾 Save</button>
+        <button class="btn btn-ghost btn-sm" onclick="copyOutput('ideas-output')">📋 Copy All</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================
+       PANEL 2 – TITLE GENERATOR
+       ========================================================== -->
+  <section id="panel-titles" class="tool-panel" role="tabpanel">
+    <div class="card">
+      <h2><span class="emoji">🔥</span> Viral Title Generator</h2>
+      <label for="title-topic">Enter Your Topic</label>
+      <input type="text" id="title-topic" placeholder="e.g. GTA 6 Easter Eggs, Funniest Fails..." maxlength="80" />
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="generateTitles()">🔥 Generate Titles</button>
+        <button class="btn btn-ghost btn-sm" onclick="clearOutput('titles-output','titles-actions')">🗑️ Clear</button>
+      </div>
+
+      <div id="titles-output" class="output-box hidden"></div>
+      <div id="titles-actions" class="copy-row" style="display:none;">
+        <button class="btn btn-ghost btn-sm" onclick="saveResult('titles-output','🔥 Titles')">💾 Save</button>
+        <button class="btn btn-ghost btn-sm" onclick="copyOutput('titles-output')">📋 Copy All</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================
+       PANEL 3 – TAG GENERATOR
+       ========================================================== -->
+  <section id="panel-tags" class="tool-panel" role="tabpanel">
+    <div class="card">
+      <h2><span class="emoji">🏷️</span> SEO Tag & Hashtag Generator</h2>
+      <label for="tag-topic">Enter Topic / Keyword</label>
+      <input type="text" id="tag-topic" placeholder="e.g. gaming, funny moments, GTA..." maxlength="60" />
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="generateTags()">🏷️ Generate Tags</button>
+        <button class="btn btn-ghost btn-sm" onclick="clearOutput('tags-output','tags-actions')">🗑️ Clear</button>
+      </div>
+
+      <div id="tags-output" class="output-box hidden"></div>
+      <div id="tags-actions" class="copy-row" style="display:none;">
+        <button class="btn btn-ghost btn-sm" onclick="saveResult('tags-output','🏷️ Tags')">💾 Save</button>
+        <button class="btn btn-ghost btn-sm" onclick="copyOutput('tags-output')">📋 Copy All</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================
+       PANEL 4 – SCRIPT GENERATOR
+       ========================================================== -->
+  <section id="panel-script" class="tool-panel" role="tabpanel">
+    <div class="card">
+      <h2><span class="emoji">📝</span> Viral Script Generator</h2>
+      <label for="script-topic">Enter Video Topic</label>
+      <input type="text" id="script-topic" placeholder="e.g. Hidden GTA glitch, Prank gone wrong..." maxlength="80" />
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="generateScript()">📝 Generate Script</button>
+        <button class="btn btn-ghost btn-sm" onclick="clearOutput('script-output','script-actions')">🗑️ Clear</button>
+      </div>
+
+      <div id="script-output" class="output-box hidden"></div>
+      <div id="script-actions" class="copy-row" style="display:none;">
+        <button class="btn btn-ghost btn-sm" onclick="saveResult('script-output','📝 Script')">💾 Save</button>
+        <button class="btn btn-ghost btn-sm" onclick="copyOutput('script-output')">📋 Copy All</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================
+       PANEL 5 – UPLOAD TIME SUGGESTION
+       ========================================================== -->
+  <section id="panel-upload" class="tool-panel" role="tabpanel">
+    <div class="card">
+      <h2><span class="emoji">⏰</span> Best Upload Time</h2>
+      <label for="country-select">Select Your Country</label>
+      <select id="country-select">
+        <option value="BD">🇧🇩 Bangladesh</option>
+        <option value="IN">🇮🇳 India</option>
+        <option value="US">🇺🇸 United States</option>
+        <option value="UK">🇬🇧 United Kingdom</option>
+        <option value="PK">🇵🇰 Pakistan</option>
+        <option value="ID">🇮🇩 Indonesia</option>
+        <option value="NG">🇳🇬 Nigeria</option>
+        <option value="PH">🇵🇭 Philippines</option>
+      </select>
+      <button class="btn btn-primary" onclick="showUploadTimes()">⏰ Show Best Times</button>
+      <div id="upload-output" class="output-box hidden" style="margin-top:20px;"></div>
+    </div>
+  </section>
+
+  <!-- ==========================================================
+       PANEL 6 – SAVED RESULTS
+       ========================================================== -->
+  <section id="panel-saved" class="tool-panel" role="tabpanel">
+    <div class="card">
+      <h2><span class="emoji">💾</span> Saved Results</h2>
+      <div class="btn-row" style="margin-bottom:20px;">
+        <button class="btn btn-ghost btn-sm" onclick="clearAllSaved()">🗑️ Clear All Saved</button>
+      </div>
+      <div id="saved-list">
+        <p style="color:var(--muted);font-size:14px;text-align:center;padding:20px 0;">No saved results yet. Generate something and click 💾 Save!</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <p>ViralShorts Studio &copy; 2025 · Powered by Gemini AI &nbsp;·&nbsp; Made for YouTube Creators ❤️</p>
+  </footer>
+</div><!-- /wrapper -->
+
+
+<!-- ============================================================
+     JAVASCRIPT – All Data & Logic + Gemini AI Integration
+     ============================================================ -->
+<script>
+/* ── GEMINI API CONFIG ──────────────────────────────────────────── */
+const GEMINI_API_KEY = 'AIzaSyAhwuf_dzowVOXdwrKjxXaAv4IicaQQryM';
+const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
+
+/**
+ * Calls the Gemini REST API with a plain-text prompt.
+ * Returns the model's text response, or null on any failure (offline, quota, etc.).
+ * All 5 generators call this first, then fall back to static data if null is returned.
+ */
+async function callGemini(prompt) {
+  try {
+    const res = await fetch(GEMINI_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: { temperature: 1.0, maxOutputTokens: 700 }
+      })
+    });
+    if (!res.ok) return null;
+    const json = await res.json();
+    return json?.candidates?.[0]?.content?.parts?.[0]?.text ?? null;
+  } catch {
+    return null; // network error → use offline fallback
+  }
+}
+
+/* ── DATA BANK (offline fallback) ───────────────────────────────── */
+
+const DATA = {
+  ideas: {
+    gaming: [
+      "I tried speedrunning this game blindfolded — here's what happened",
+      "The glitch that breaks the entire game in under 10 seconds",
+      "When NPCs become TOO realistic… 😱",
+      "I completed this game using ONLY one button",
+      "The rarest in-game event I waited 3 hours for",
+      "Hidden secret developers never wanted you to find",
+      "This game mechanic makes zero sense… until now",
+      "I joined a random lobby and this happened",
+      "Every streaming error in 60 seconds (PAINFUL)",
+      "The hardest challenge that 99% of players fail",
+      "I trapped the whole lobby in an impossible loop",
+      "What happens when you break the game's physics engine?",
+      "I found a level that was NEVER released",
+      "Pro player vs noob: unexpected twist ending",
+      "The Easter egg hidden since day 1 — nobody noticed",
+    ],
+    funny: [
+      "I said 'no' to everything for 24 hours — disaster",
+      "Ordering food using ONLY emoji 🍕🤡",
+      "The most embarrassing autocorrect fails of 2024",
+      "When you forget your microphone is still ON 😂",
+      "Explaining my job to grandma (she had questions…)",
+      "First time cooking: step-by-step failure montage",
+      "My cat judged every decision I made today",
+      "Trying TikTok life hacks: do they actually work?",
+      "One day without my phone — I didn't survive",
+      "The funniest gym fails caught on camera",
+      "When the delivery driver takes a 'shortcut'",
+      "Zero-budget movie remake: Hollywood vs. my bedroom",
+      "I let AI plan my entire day. Big mistake.",
+      "Reacting to my 5-year-old self's YouTube comment",
+      "Why my morning routine takes 3 hours 💀",
+    ],
+    gta: [
+      "This GTA glitch lets you fly without a vehicle",
+      "Hidden GTA 6 Easter egg found after 1,000 hours",
+      "The NPC fight club nobody talks about",
+      "I became a billionaire in GTA using this one trick",
+      "Destroying the entire police system in 60 seconds",
+      "GTA secret location that doesn't exist on the map",
+      "What happens if you never commit a crime in GTA?",
+      "The fastest car that developers hid from players",
+      "I survived every wanted level using zero weapons",
+      "GTA physics vs. Real life — who wins?",
+      "The tunnel that breaks the GTA map completely",
+      "I spent 6 hours doing only legal things in GTA",
+      "This mod makes GTA terrifyingly realistic",
+      "Found a working radio station inside an abandoned building",
+      "The rarest random event that 1% of players see",
+    ],
+    tech: [
+      "I hacked my own smart home and found something scary",
+      "5 tech tricks your phone has been hiding from you",
+      "I built a PC for $200 — how bad is it?",
+      "The app that records everything you type (Delete it now)",
+      "ChatGPT vs Gemini: who writes better code?",
+      "My entire digital life in 60 seconds",
+      "This $10 gadget replaced my $500 setup",
+      "I gave AI my entire camera roll — here's what it said",
+      "Why your Wi-Fi is secretly slower than it should be",
+      "The browser extension that saved me 4 hours a day",
+    ],
+    life: [
+      "I woke up at 4AM for 30 days — life changed",
+      "The habit that made me 10x more productive",
+      "Why I quit social media for 90 days (brutal truth)",
+      "Reading 1 book a week for a year — what I learned",
+      "The morning routine of top 1% earners",
+      "I tried living on $5/day for a week",
+      "Zero screen time weekend: was it worth it?",
+      "The mindset shift that changed everything for me",
+      "Why busy people accomplish less than focused people",
+      "I said YES to everything for 7 days — results inside",
+    ],
+  },
+
+  titleTemplates: [
+    "I {verb} {topic} for {time} and this happened 😱",
+    "Nobody told me {topic} could do THIS",
+    "The SECRET {topic} trick that pros don't want you to know",
+    "I tried every {topic} method — here's the WINNER",
+    "{topic} challenge gone WRONG 💀",
+    "POV: You discover {topic} for the first time",
+    "Why {topic} is secretly the BEST thing ever",
+    "I spent {time} learning {topic} — here's the truth",
+    "{topic} but make it IMPOSSIBLE",
+    "The {topic} glitch that breaks everything 🤯",
+    "Trying {topic} for the first time (PAINFUL)",
+    "What {topic} doesn't want you to know",
+    "I asked 100 people about {topic} — shocking answers",
+    "{topic} master vs beginner: who wins?",
+    "This {topic} trick changed my life in {time}",
+    "The REAL reason everyone is obsessed with {topic}",
+    "{topic} in 60 seconds — can it be done?",
+    "Watch me ruin {topic} in under 1 minute",
+  ],
+  titleVerbs: ["played","studied","broke","mastered","tested","fixed","hacked","used","reviewed","destroyed"],
+  titleTimes: ["24 hours","7 days","30 days","1 week","60 days","an entire year","3 hours","one day"],
+
+  tagBase: {
+    seo: [
+      "youtube shorts","viral shorts","shorts video","viral content","content creator","youtube growth",
+      "shorts strategy","how to go viral","viral tips","short form content","youtube algorithm",
+      "video ideas","viral ideas","content ideas","youtube success","creator tips","grow on youtube",
+      "shorts tricks","youtube hacks","viral moment","get more views","youtube 2025",
+    ],
+    hash: [
+      "#Shorts","#YouTubeShorts","#Viral","#ViralShorts","#ContentCreator","#YouTuber","#GrowOnYouTube",
+      "#VideoIdeas","#ShortForm","#CreatorTips","#ViralContent","#ShortsTrends","#YoutubeAlgorithm",
+      "#SmallYoutuber","#NewYoutuber","#ViralVideo","#SubscribeNow","#TrendingShorts",
+    ],
+  },
+
+  hooks: [
+    "Wait — before you scroll, you NEED to see this.",
+    "This one trick changed everything. I'm not joking.",
+    "I can't believe this actually worked…",
+    "You're going to want to try this right now.",
+    "Nobody is talking about this and it's wild.",
+    "Stop everything — this is insane.",
+    "If you do this every day, your life will change.",
+    "I tested this so you don't have to.",
+    "This secret has been hidden for years. Until now.",
+    "What I'm about to show you will blow your mind.",
+  ],
+  actions: [
+    "Here's exactly what I did, step by step. First, {topic}. Then, I pushed it further. Then, something unexpected happened.",
+    "I went full send on {topic}. No tutorials, no guides — just raw effort and chaos.",
+    "Starting from zero, I tackled {topic} head-on. Every mistake, every win, condensed right here.",
+    "Watch me go from clueless to crushing it with {topic} in real time.",
+    "I broke {topic} into the simplest possible steps and executed each one. Here's the result.",
+  ],
+  twists: [
+    "…and the result was NOTHING like I expected. 😮",
+    "…turns out I was doing it completely wrong the whole time. 💀",
+    "…and now I can never go back to the old way. 🔥",
+    "…then one small detail changed absolutely everything.",
+    "…the twist? It worked BETTER than any pro method out there.",
+    "…but the real surprise came at the very end. Watch till the last second.",
+    "…and then the algorithm exploded. I'm still shocked.",
+  ],
+
+  uploadTimes: {
+    BD: { zone:"BST (UTC+6)", peak:["12:00 PM","5:00 PM","9:00 PM"], note:"Bangladesh audience is most active post-school & evening" },
+    IN: { zone:"IST (UTC+5:30)", peak:["1:00 PM","6:00 PM","9:30 PM"], note:"India's prime-time viewing is after work hours" },
+    US: { zone:"EST/PST", peak:["12:00 PM ET","3:00 PM ET","8:00 PM ET"], note:"East Coast lunch & West Coast morning overlap best" },
+    UK: { zone:"GMT/BST", peak:["12:00 PM","5:30 PM","9:00 PM"], note:"UK audience peaks during lunch and after work" },
+    PK: { zone:"PKT (UTC+5)", peak:["1:00 PM","6:00 PM","10:00 PM"], note:"Pakistan evening slots drive the most engagement" },
+    ID: { zone:"WIB (UTC+7)", peak:["12:00 PM","5:00 PM","9:00 PM"], note:"Indonesia peak aligns with midday breaks and evenings" },
+    NG: { zone:"WAT (UTC+1)", peak:["12:00 PM","6:00 PM","9:00 PM"], note:"Nigeria's mobile-first audience peaks during evenings" },
+    PH: { zone:"PHT (UTC+8)", peak:["12:00 PM","6:00 PM","10:00 PM"], note:"Philippines late-night viewing is exceptionally high" },
+  },
+};
+
+/* ── UTILITIES ─────────────────────────────────────────────────── */
+const rand = (arr) => arr[Math.floor(Math.random() * arr.length)];
+const shuffle = (arr) => [...arr].sort(() => Math.random() - .5);
+
+function showToast(msg = "✅ Copied!", duration = 2500) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), duration);
+}
+
+function showLoader(containerId, msg = 'Asking Gemini AI…') {
+  const el = document.getElementById(containerId);
+  el.classList.remove('hidden');
+  el.innerHTML = `<div class="loader">
+    <div class="loader-dots"><span></span><span></span><span></span></div>
+    <span>${msg}</span>
+  </div>`;
+}
+
+function switchTab(name, btn) {
+  document.querySelectorAll('.tool-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  btn.classList.add('active');
+  if (name === 'saved') renderSaved();
+}
+
+function clearOutput(outId, actionsId) {
+  const o = document.getElementById(outId);
+  o.classList.add('hidden');
+  o.innerHTML = '';
+  if (actionsId) {
+    const a = document.getElementById(actionsId);
+    if (a) a.style.display = 'none';
+  }
+}
+
+function showActions(actionsId) {
+  const a = document.getElementById(actionsId);
+  if (a) a.style.display = 'flex';
+}
+
+function copyOutput(outId) {
+  const el = document.getElementById(outId);
+  const text = el.innerText || el.textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    showToast('📋 Copied to clipboard!');
+  }).catch(() => {
+    // fallback
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast('📋 Copied!');
+  });
+}
+
+/* ── LOCAL STORAGE ─────────────────────────────────────────────── */
+function getSaved() {
+  try { return JSON.parse(localStorage.getItem('vss_saved') || '[]'); }
+  catch { return []; }
+}
+function setSaved(data) {
+  localStorage.setItem('vss_saved', JSON.stringify(data));
+}
+
+function saveResult(outId, label) {
+  const txt = document.getElementById(outId).innerText.trim();
+  if (!txt) return;
+  const saved = getSaved();
+  saved.unshift({ label, text: txt, date: new Date().toLocaleDateString() });
+  if (saved.length > 20) saved.length = 20;
+  setSaved(saved);
+  showToast('💾 Saved!');
+}
+
+function clearAllSaved() {
+  localStorage.removeItem('vss_saved');
+  renderSaved();
+  showToast('🗑️ All cleared!');
+}
+
+function deleteSaved(index) {
+  const saved = getSaved();
+  saved.splice(index, 1);
+  setSaved(saved);
+  renderSaved();
+}
+
+function renderSaved() {
+  const container = document.getElementById('saved-list');
+  const saved = getSaved();
+  if (!saved.length) {
+    container.innerHTML = '<p style="color:var(--muted);font-size:14px;text-align:center;padding:20px 0;">No saved results yet. Generate something and click 💾 Save!</p>';
+    return;
+  }
+  container.innerHTML = saved.map((item, i) => `
+    <div class="saved-item">
+      <div class="saved-label">${item.label} · ${item.date}</div>
+      <div style="white-space:pre-wrap;line-height:1.6;">${escapeHtml(item.text)}</div>
+      <button class="del-btn" onclick="deleteSaved(${i})" title="Delete">✕</button>
+    </div>
+  `).join('');
+}
+
+function escapeHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+/* ── IDEA GENERATOR ────────────────────────────────────────────── */
+async function generateIdeas() {
+  const niche = document.getElementById('niche-select').value;
+  showLoader('ideas-output');
+
+  const prompt = `Give me exactly 5 unique, viral YouTube Shorts video ideas for the "${niche}" niche.
+Format: return ONLY a numbered list (1. ... 2. ... etc.), one idea per line, no extra text.
+Each idea should be catchy, curiosity-driven, and optimised for high click-through rates.`;
+
+  const aiText = await callGemini(prompt);
+  let items;
+
+  if (aiText) {
+    // Parse numbered lines from Gemini response
+    items = aiText.split('\n')
+      .map(l => l.replace(/^\d+[.)\s]+/, '').trim())
+      .filter(l => l.length > 4)
+      .slice(0, 5);
+  }
+
+  // Fallback to static data if AI returned nothing useful
+  if (!items || items.length < 3) {
+    const pool = DATA.ideas[niche] || DATA.ideas.gaming;
+    items = shuffle(pool).slice(0, 5);
+  }
+
+  const html = `<ul class="output-list">${items.map((idea, i) =>
+    `<li style="animation-delay:${i*.08}s"><span class="num">${i+1}</span><span>${idea}</span></li>`
+  ).join('')}</ul>`;
+  document.getElementById('ideas-output').innerHTML = html;
+  showActions('ideas-actions');
+}
+
+/* ── TITLE GENERATOR ───────────────────────────────────────────── */
+async function generateTitles() {
+  const topic = document.getElementById('title-topic').value.trim() || 'this video';
+  showLoader('titles-output');
+
+  const prompt = `Generate exactly 10 ultra-viral YouTube Shorts video titles about: "${topic}".
+Rules:
+- Use power words, numbers, curiosity gaps, and emotional triggers
+- Mix styles: how-to, shock, POV, challenge, secret reveal
+- Format: return ONLY a numbered list (1. ... 2. ... etc.), one title per line, no extra commentary
+- Each title must be under 70 characters`;
+
+  const aiText = await callGemini(prompt);
+  let titles;
+
+  if (aiText) {
+    titles = aiText.split('\n')
+      .map(l => l.replace(/^\d+[.)\s]+/, '').trim())
+      .filter(l => l.length > 4)
+      .slice(0, 10);
+  }
+
+  if (!titles || titles.length < 5) {
+    titles = shuffle(DATA.titleTemplates).slice(0, 10).map(t =>
+      t.replace(/{topic}/g, topic)
+        .replace(/{verb}/g, rand(DATA.titleVerbs))
+        .replace(/{time}/g, rand(DATA.titleTimes))
+    );
+  }
+
+  const html = `<ul class="output-list">${titles.map((title, i) =>
+    `<li style="animation-delay:${i*.06}s"><span class="num">${i+1}</span><span>${title}</span></li>`
+  ).join('')}</ul>`;
+  document.getElementById('titles-output').innerHTML = html;
+  showActions('titles-actions');
+}
+
+/* ── TAG GENERATOR ─────────────────────────────────────────────── */
+async function generateTags() {
+  const topic = document.getElementById('tag-topic').value.trim() || 'youtube shorts';
+  showLoader('tags-output');
+
+  const prompt = `Generate SEO tags and hashtags for a YouTube Shorts video about: "${topic}".
+Return EXACTLY this format (no extra text):
+SEO: tag1, tag2, tag3, tag4, tag5, tag6, tag7, tag8, tag9, tag10, tag11, tag12
+HASHTAGS: #Tag1, #Tag2, #Tag3, #Tag4, #Tag5, #Tag6, #Tag7, #Tag8, #Tag9, #Tag10, #Tag11, #Tag12
+SEO tags: short keyphrases (2-4 words), highly searchable.
+Hashtags: CamelCase, no spaces, relevant to YouTube Shorts.`;
+
+  const aiText = await callGemini(prompt);
+  let seoTags, hashTags;
+
+  if (aiText) {
+    const seoLine  = aiText.match(/SEO:\s*(.+)/i)?.[1] || '';
+    const hashLine = aiText.match(/HASHTAGS:\s*(.+)/i)?.[1] || '';
+    seoTags  = seoLine.split(',').map(t => t.trim()).filter(Boolean).slice(0, 14);
+    hashTags = hashLine.split(',').map(t => t.trim()).filter(Boolean).slice(0, 14);
+  }
+
+  if (!seoTags || seoTags.length < 4) {
+    const extra = [topic, topic+' shorts', topic+' viral', 'best '+topic, topic+' 2025'];
+    seoTags  = shuffle([...DATA.tagBase.seo, ...extra]).slice(0, 14);
+    hashTags = shuffle([...DATA.tagBase.hash, '#'+topic.replace(/\s+/g,'')]).slice(0, 14);
+  }
+
+  const html = `
+    <p style="font-size:12px;color:var(--muted);margin-bottom:12px;font-weight:600;letter-spacing:.4px;">SEO KEYWORDS</p>
+    <div class="tags-cloud">${seoTags.map(t => `<span class="tag seo">${t}</span>`).join('')}</div>
+    <p style="font-size:12px;color:var(--muted);margin:18px 0 12px;font-weight:600;letter-spacing:.4px;">HASHTAGS</p>
+    <div class="tags-cloud">${hashTags.map(t => `<span class="tag hash">${t}</span>`).join('')}</div>
+  `;
+  document.getElementById('tags-output').innerHTML = html;
+  showActions('tags-actions');
+}
+
+/* ── SCRIPT GENERATOR ──────────────────────────────────────────── */
+async function generateScript() {
+  const topic = document.getElementById('script-topic').value.trim() || 'this challenge';
+  showLoader('script-output');
+
+  const prompt = `Write a viral YouTube Shorts script (max 60 seconds) about: "${topic}".
+Return EXACTLY this format with the labels on separate lines:
+HOOK: [A punchy 1-2 sentence opening that stops the scroll in under 3 seconds]
+ACTION: [The main content — 2-4 sentences showing what happens, building tension]
+TWIST: [A shocking or satisfying ending line that makes viewers rewatch or comment]
+Make it conversational, high-energy, and optimised for viral engagement.`;
+
+  const aiText = await callGemini(prompt);
+  let hook, action, twist;
+
+  if (aiText) {
+    hook   = aiText.match(/HOOK:\s*(.+?)(?=\nACTION:|$)/is)?.[1]?.trim();
+    action = aiText.match(/ACTION:\s*(.+?)(?=\nTWIST:|$)/is)?.[1]?.trim();
+    twist  = aiText.match(/TWIST:\s*(.+)/is)?.[1]?.trim();
+  }
+
+  // Fallback to static arrays if parsing failed
+  if (!hook)   hook   = rand(DATA.hooks);
+  if (!action) action = rand(DATA.actions).replace(/{topic}/g, topic);
+  if (!twist)  twist  = rand(DATA.twists);
+
+  const html = `
+    <div class="script-block">
+      <h3>🎣 Hook (0–3 sec)</h3>
+      <p>${hook}</p>
+    </div>
+    <div class="script-block">
+      <h3>⚡ Action (3–50 sec)</h3>
+      <p>${action}</p>
+    </div>
+    <div class="script-block">
+      <h3>🌀 Twist / Outro (last 5 sec)</h3>
+      <p>${twist} &nbsp;&nbsp;<strong style="color:var(--neon1);">Like & subscribe for more 🔥</strong></p>
+    </div>
+  `;
+  document.getElementById('script-output').innerHTML = html;
+  showActions('script-actions');
+}
+
+/* ── UPLOAD TIME ───────────────────────────────────────────────── */
+function showUploadTimes() {
+  const country = document.getElementById('country-select').value;
+  showLoader('upload-output');
+  setTimeout(() => {
+    const info = DATA.uploadTimes[country];
+    const icons = ['🌞','🌆','🌙'];
+    const labels = ['Midday Boost','Afternoon Peak','Prime Night'];
+    const html = `
+      <p style="font-size:13px;color:var(--muted);margin-bottom:16px;">📍 Timezone: <strong style="color:var(--text);">${info.zone}</strong></p>
+      <div class="time-cards">
+        ${info.peak.map((t,i) => `
+          <div class="time-card">
+            <div style="font-size:1.8rem;">${icons[i]}</div>
+            <div class="time">${t}</div>
+            <div class="label">${labels[i]}</div>
+            <div class="peak">↑ High Engagement</div>
+          </div>
+        `).join('')}
+      </div>
+      <p style="font-size:12.5px;color:var(--muted);margin-top:16px;">💡 ${info.note}</p>
+      <p style="font-size:12px;color:rgba(255,255,255,0.25);margin-top:10px;">* Based on general audience activity patterns. Adjust through your YouTube Analytics.</p>
+    `;
+    document.getElementById('upload-output').innerHTML = html;
+    document.getElementById('upload-output').classList.remove('hidden');
+  }, 900 + Math.random()*400);
+}
+
+/* ── KEYBOARD SHORTCUT – Enter triggers generate ──────────────── */
+document.querySelectorAll('input[type="text"]').forEach(input => {
+  input.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter') return;
+    const panel = input.closest('.tool-panel');
+    if (!panel) return;
+    const btn = panel.querySelector('.btn-primary');
+    if (btn) btn.click();
+  });
+});
+
+/* ── INIT ──────────────────────────────────────────────────────── */
+// Trigger initial upload time (default Bangladesh)
+document.addEventListener('DOMContentLoaded', () => {
+  // Nothing auto-generated — user clicks to generate
+});
+</script>
+</body>
+</html>
